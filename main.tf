@@ -1,6 +1,10 @@
 #locals {
  # name = "kuber-lab01"
 #}
+provider "aws" {
+    region = "eu-west-2"
+  
+}
 
 # Creating RSA private key
 resource "tls_private_key" "keypair" {
@@ -29,51 +33,7 @@ resource "aws_security_group" "master-sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  #ingress {
-   # description = "Kubernetics API server"
-   # from_port   = 6443
-   # to_port     = 6443
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-  
-   #ingress {
-    #description = "ssh"
-    #from_port   = 22
-    #to_port     = 22
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-   #ingress {
-   # description = "client communication"
-   # from_port   = 2379
-    #to_port     = 2380
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-   #ingress {
-    #description = "Kublet API"
-    #from_port   = 10250
-    #to_port     = 10250
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-   #ingress {
-   # description = "Kube-scheduler"
-    #from_port   = 10251
-   # to_port     = 10251
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-  #ingress {
-   # description = "Kube-controller-manager"
-   # from_port   = 10252
-   # to_port     = 10252
-   # protocol    = "tcp"
-   # cidr_blocks = ["0.0.0.0/0"]
-  #}
-  # Egress rule: allow all outbound traffic
-  egress {
+    egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -84,77 +44,6 @@ resource "aws_security_group" "master-sg" {
     Name = "master-sg"
   }
 }
-
-# Creating  Worker Security Group
-#resource "aws_security_group" "worker-sg" {
- # name        = "worker-sg"
- # description = "Allow specific inbound and outbound traffic"
-
- # Ingress rule:  allow specific ports for kubernetics components
- # ingress {
-   # description = "Kublet API"
-   # from_port   = 10250
-   # to_port     = 10250
-   # protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
- # }
-  
-  # ingress {
-   # description = "ssh"
-   # from_port   = 22
-    #to_port     = 22
-    #protocol    = "tcp"
-   # cidr_blocks = ["0.0.0.0/0"]
-  #}
-   #ingress {
-   # description = "NodePort services"
-   # from_port   = 30000
-   # to_port     = 32767
-   # protocol    = "tcp"
-   # cidr_blocks = ["0.0.0.0/0"]
-  #}
-   #ingress {
-   # description = "Weave net"
-   # from_port   = 6783
-   # to_port     = 6784
-   # protocol    = "tcp"
-   # cidr_blocks = ["0.0.0.0/0"]
-  #}
-  # ingress {
-   # description = "Kubelet Read-only port"
-   # from_port   = 10255
-    #to_port     = 10255
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-  #ingress {
-   # description = "DNS Resolution"
-    #from_port   = 53
-   # to_port     = 53
-   # protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
- # }
-
-  #ingress {
-   # description = "VXLAN (Overlay Nework Traffic)"
-   # from_port   = 4789
-   # to_port     = 4789
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-
-  # Egress rule: allow all outbound traffic
-  #egress {
-   # from_port   = 0
-   # to_port     = 0
-   # protocol    = "-1"
-   # cidr_blocks = ["0.0.0.0/0"]
- # }
-
- # tags = {
-  #  Name = "worker-sg"
- # }
-#}
 
 # Creating Ec2 for Master Node
 resource "aws_instance" "master" {
@@ -183,4 +72,14 @@ resource "aws_instance" "worker" {
   tags = {
     Name = "worker-node-${count.index}"
   }
+}
+
+#To print out public ip
+output "master_ip" {
+  value = aws_instance.master.public_ip
+}
+
+output "workers_ip" {
+  value = aws_instance.worker.*.public_ip
+
 }
