@@ -1,0 +1,12 @@
+kuber01-key.pem
+.terraformrc
+terraform.rc
+*.terraform
+*.tfstate
+*.tfvars
+*.lock.hcl
+master-userdata.sh
+worker-userdata.sh
+terraform.tfstate.backup
+deployment.yml
+service.yml
